@@ -12,6 +12,7 @@
        "compute2": "121"
    },
    "neutron_networks": {
+       "neutron1": "160"
    },
    "cinder": {
        "cinder1": "130",
