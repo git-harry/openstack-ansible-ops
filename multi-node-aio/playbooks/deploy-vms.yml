@@ -49,16 +49,20 @@
         - hostvars[item]['server_vm'] | default(false) | bool
       with_items: "{{ groups['pxe_servers'] }}"
 
+    - name: Make virsh define work
+      command: "virsh capabilities"
+      changed_when: false
+
     - name: Define the VM
       command: "virsh define /etc/libvirt/qemu/{{ hostvars[item]['server_hostname'] }}.xml"
-      failed_when: false
+      changed_when: false
       when:
         - hostvars[item]['server_vm'] | default(false) | bool
       with_items: "{{ groups['pxe_servers'] }}"
 
     - name: Create the VM
       command: "virsh create /etc/libvirt/qemu/{{ hostvars[item]['server_hostname'] }}.xml"
-      failed_when: false
+      changed_when: false
       when:
         - hostvars[item]['server_vm'] | default(false) | bool
       with_items: "{{ groups['pxe_servers'] }}"

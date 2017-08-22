@@ -92,7 +92,7 @@
     - name: Drop inetd configs
       copy:
         src: "pxe/tftp/inetd.conf"
-        dest: /etc/default/tftpd-hpa
+        dest: /etc/inetd.d/tftpd-hpa
         mode: "0644"
         owner: root
         group: root
@@ -104,6 +104,10 @@
         url: "{{ item.value.image_iso_url }}"
         dest: "/var/www/pxe/iso/{{ item.value.image_name }}"
       with_dict: "{{ images }}"
+      register: downloaded_images
+      until: downloaded_images | success
+      retries: 5
+      delay: 10
 
     - name: Remove image directory if it exists
       file:
@@ -131,6 +135,10 @@
         url: "{{ pxelinux_url }}"
         dest: "/var/www/pxe/{{ pxelinux_name }}"
         tmp_dest: /tmp/
+      register: downloaded_pxelinux
+      until: downloaded_pxelinux | success
+      retries: 5
+      delay: 10
 
     - name: Remove image directory if it exists
       file:
