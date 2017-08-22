@@ -27,9 +27,9 @@ DEFAULT_IMAGE="${DEFAULT_IMAGE:-"$(lsb_release -sd | awk '{print $2}')"}"
 DEFAULT_KERNEL="${DEFAULT_KERNEL:-linux-image-extra-4.4.0-67-generic}"
 
 # Install cobbler
-wget -qO - http://download.opensuse.org/repositories/home:/libertas-ict:/cobbler26/xUbuntu_14.04/Release.key | apt-key add -
-add-apt-repository "deb http://download.opensuse.org/repositories/home:/libertas-ict:/cobbler26/xUbuntu_14.04/ ./"
-apt-get update && DEBIAN_FRONTEND=noninteractive apt-get -y --force-yes install cobbler dhcp3-server debmirror isc-dhcp-server ipcalc tftpd tftp fence-agents iptables-persistent
+dpkg -i cobbler_2.6.11-1_all.deb || true
+apt-get install -fy
+apt-get update && DEBIAN_FRONTEND=noninteractive apt-get -y --force-yes install dhcp3-server debmirror isc-dhcp-server ipcalc tftpd tftp fence-agents iptables-persistent
 
 # Basic cobbler setup
 sed -i 's/^manage_dhcp\:.*/manage_dhcp\: 1/g' /etc/cobbler/settings
@@ -175,11 +175,3 @@ cobbler sync
 # Restart XinetD
 service xinetd stop
 service xinetd start
-
-# Remove the expired key and opensuse repo, no need after the cobbler being set up.
-aptkey_mesg=$(apt-key list)
-if [[ $(contains "$aptkey_mesg" "expired") -gt 0 ]]; then
-    expired_key=$(echo "$aptkey_mesg" | awk /expired/'{print $ sub(".*\/", "")}')
-    apt-key del $expired_key
-    add-apt-repository --remove "deb http://download.opensuse.org/repositories/home:/libertas-ict:/cobbler26/xUbuntu_14.04/ ./"
-fi
